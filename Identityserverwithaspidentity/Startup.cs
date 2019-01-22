@@ -12,6 +12,12 @@ using Microsoft.EntityFrameworkCore;
 using Identityserverwithaspidentity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Identityserverwithaspidentity.Data;
+using Identityserverwithaspidentity.Models;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+//using Identityserverwithaspidentity.Areas.Identity.Data;
+using IdentityServer4.Services;
 
 namespace Identityserverwithaspidentity
 {
