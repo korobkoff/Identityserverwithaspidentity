@@ -16,7 +16,7 @@ using Identityserverwithaspidentity.Data;
 using Identityserverwithaspidentity.Models;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-//using Identityserverwithaspidentity.Areas.Identity.Data;
+using Identityserverwithaspidentity.Areas.Identity.Data;
 using IdentityServer4.Services;
 
 namespace Identityserverwithaspidentity
@@ -33,20 +33,38 @@ namespace Identityserverwithaspidentity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
+
+            var certPath = Path.Combine("", "SscSign.pfx");
+            var cert = new X509Certificate2(certPath);
+        
+            services.AddDefaultIdentity<IdentityserverwithaspidentityUser>()
+                .AddDefaultTokenProviders()
+                .AddDefaultUI()
+                .AddEntityFrameworkStores<IdentityserverwithaspidentityContext>();
+            
+          
+            var builder = services.AddIdentityServer(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+                options.IssuerUri = "SomeSecureCompany";
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+                options.UserInteraction.LoginUrl = "/Identity/Account/Login";
+                options.UserInteraction.LogoutUrl = "/Identity/Account/Logout";
+            })
+            .AddInMemoryIdentityResources(Config.GetIdentityResources())
+            .AddInMemoryApiResources(Config.GetApiResources())
+            .AddInMemoryClients(Config.GetClients())
+            .AddAspNetIdentity<IdentityserverwithaspidentityUser>()
+            .AddSigningCredential(cert);
+            services.AddTransient<IProfileService, ProfileService>();
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,11 +81,12 @@ namespace Identityserverwithaspidentity
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
+            app.UseIdentityServer();
 
             app.UseMvc(routes =>
             {
