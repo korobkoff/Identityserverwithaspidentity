@@ -34,9 +34,10 @@ namespace Identityserverwithaspidentity
         public void ConfigureServices(IServiceCollection services)
         {
 
-            var certPath = Path.Combine("", "SscSign.pfx");
-            var cert = new X509Certificate2(certPath);
-        
+            var certPath = Path.Combine(Environment.CurrentDirectory, "SscSign.pfx");
+            var cert = new X509Certificate2(certPath, "", X509KeyStorageFlags.MachineKeySet);
+
+
             services.AddDefaultIdentity<IdentityserverwithaspidentityUser>()
                 .AddDefaultTokenProviders()
                 .AddDefaultUI()
