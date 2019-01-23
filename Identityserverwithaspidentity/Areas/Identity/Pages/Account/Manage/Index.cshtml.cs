@@ -40,6 +40,17 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "GivenName")]
+            public string GivenName { get; set; }
+
+            [Required]
+            [Display(Name = "Surname")]
+            [DataType(DataType.Text)]
+            public string Surname { get; set; }
+
             [Required]
             [EmailAddress]
             public string Email { get; set; }
@@ -65,6 +76,8 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                GivenName = user.GivenName,
+                Surname = user.Surname,
                 Email = email,
                 PhoneNumber = phoneNumber
             };
@@ -85,6 +98,16 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (Input.GivenName != user.GivenName)
+            {
+                user.GivenName = Input.GivenName;
+            }
+
+            if (Input.Surname != user.Surname)
+            {
+                user.Surname = Input.Surname;
             }
 
             var email = await _userManager.GetEmailAsync(user);
@@ -108,6 +131,8 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account.Manage
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
             }
+
+            await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

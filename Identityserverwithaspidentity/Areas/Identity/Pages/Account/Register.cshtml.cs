@@ -41,6 +41,16 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Name")]
+            public string GivenName { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Surname")]
+            public string Surname { get; set; }
+
+            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
@@ -67,7 +77,13 @@ namespace Identityserverwithaspidentity.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new IdentityserverwithaspidentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new IdentityserverwithaspidentityUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    GivenName = Input.GivenName,
+                    Surname = Input.Surname
+                };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
